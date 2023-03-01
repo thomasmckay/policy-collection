@@ -3,7 +3,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
-  name: policy-gatekeeper-config-exclude-namespaces
+  name: policy-exclude-namespaces
   annotations:
     policy.open-cluster-management.io/standards: NIST SP 800-53
     policy.open-cluster-management.io/categories: CM Configuration Management
@@ -104,28 +104,3 @@ spec:
                         - openshift-vsphere-infra
                       processes:
                         - '*'
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: PlacementBinding
-metadata:
-  name: binding-policy-gatekeeper-config-exclude-namespaces
-placementRef:
-  name: placement-policy-gatekeeper-config-exclude-namespaces
-  kind: PlacementRule
-  apiGroup: apps.open-cluster-management.io
-subjects:
-- name: policy-gatekeeper-config-exclude-namespaces
-  kind: Policy
-  apiGroup: policy.open-cluster-management.io
----
-apiVersion: apps.open-cluster-management.io/v1
-kind: PlacementRule
-metadata:
-  name: placement-policy-gatekeeper-config-exclude-namespaces
-spec:
-  clusterConditions:
-  - status: "True"
-    type: ManagedClusterConditionAvailable
-  clusterSelector:
-    matchExpressions:
-      - {key: environment, operator: In, values: ["dev"]}

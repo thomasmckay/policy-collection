@@ -43,9 +43,10 @@ spec:
                         violation[{"msg": msg, "details": {"missing_labels": missing}}] {
                           provided := {label | input.review.object.metadata.labels[label]}
                           required := {label | label := input.parameters.labels[_]}
+                          ns := input.review.object.metadata.namespace
                           missing := required - provided
                           count(missing) > 0
-                          msg := sprintf("you must provide labels: %v", [missing])
+                          msg := sprintf("you must provide labels in namespace \"%s\": %v", [ns, missing])
                         }
             - complianceType: musthave
               objectDefinition:
@@ -58,10 +59,7 @@ spec:
                   match:
                     kinds:
                       - apiGroups: [""]
-                        kinds: ["Namespace"]
-                    namespaces:
-                      - e2etestsuccess
-                      - e2etestfail
+                        kinds: ["Namespace", "Pod"]
                   parameters:
                     labels: ["gatekeeper"]
     - objectDefinition:
@@ -101,28 +99,3 @@ spec:
                     constraint_kind: K8sRequiredLabels
                     constraint_name: ns-must-have-gk
                     event_type: violation
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: PlacementBinding
-metadata:
-  name: binding-policy-gatekeeper
-placementRef:
-  name: placement-policy-gatekeeper
-  kind: PlacementRule
-  apiGroup: apps.open-cluster-management.io
-subjects:
-- name: policy-gatekeeper
-  kind: Policy
-  apiGroup: policy.open-cluster-management.io
----
-apiVersion: apps.open-cluster-management.io/v1
-kind: PlacementRule
-metadata:
-  name: placement-policy-gatekeeper
-spec:
-  clusterConditions:
-  - status: "True"
-    type: ManagedClusterConditionAvailable
-  clusterSelector:
-    matchExpressions:
-      - {key: environment, operator: In, values: ["dev"]}

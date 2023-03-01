@@ -103,36 +103,11 @@ spec:
                 name: gatekeeper
               spec:
                 audit:
-                  logLevel: INFO
+                  logLevel: DEBUG
                   replicas: 1
                 validatingWebhook: Enabled
-                mutatingWebhook: Disabled
+                mutatingWebhook: Enabled
                 webhook:
                   emitAdmissionEvents: Enabled
-                  logLevel: INFO
+                  logLevel: DEBUG
                   replicas: 2
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: PlacementBinding
-metadata:
-  name: binding-policy-gatekeeper-operator
-placementRef:
-  name: placement-policy-gatekeeper-operator
-  kind: PlacementRule
-  apiGroup: apps.open-cluster-management.io
-subjects:
-- name: policy-gatekeeper-operator
-  kind: Policy
-  apiGroup: policy.open-cluster-management.io
----
-apiVersion: apps.open-cluster-management.io/v1
-kind: PlacementRule
-metadata:
-  name: placement-policy-gatekeeper-operator
-spec:
-  clusterConditions:
-  - status: "True"
-    type: ManagedClusterConditionAvailable
-  clusterSelector:
-    matchExpressions:
-      - {key: environment, operator: In, values: ["dev"]}
